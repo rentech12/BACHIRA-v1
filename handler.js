@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 import url from "url";
-import config from "./config.json" assert { type: "json" };
+import config from "./config.json"; // plus besoin de 'assert { type: "json" }'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-// Charger les commandes
+// Charger les commandes dynamiquement
 const commands = {};
 const cmdPath = path.join(__dirname, "commands");
 
@@ -27,7 +27,7 @@ export async function sendMessageWithContext(sock, jid, text, quotedMsg = null) 
       isForwarded: false,
       externalAdReply: {
         title: "Bachira V1 Bot",
-        body: "view channel",
+        body: "View Channel",
         mediaUrl: "https://whatsapp.com/channel/0029VbBjwT52f3ELVPsK6V2K",
         mediaType: 2
       }
@@ -35,6 +35,7 @@ export async function sendMessageWithContext(sock, jid, text, quotedMsg = null) 
   });
 }
 
+// Handler principal
 export default async function handler(msg, sock) {
   try {
     const text =
