@@ -17,6 +17,24 @@ for (let file of fs.readdirSync(cmdPath)) {
   }
 }
 
+// Fonction utilitaire pour envoyer un message avec contextInfo
+export async function sendMessageWithContext(sock, jid, text, quotedMsg = null) {
+  await sock.sendMessage(jid, {
+    text,
+    contextInfo: {
+      mentionedJid: quotedMsg ? [quotedMsg.key.participant || jid] : [],
+      forwardingScore: 0,
+      isForwarded: false,
+      externalAdReply: {
+        title: "Bachira V1 Bot",
+        body: "view channel",
+        mediaUrl: "https://whatsapp.com/channel/0029VbBjwT52f3ELVPsK6V2K",
+        mediaType: 2
+      }
+    }
+  });
+}
+
 export default async function handler(msg, sock) {
   try {
     const text =
@@ -31,11 +49,14 @@ export default async function handler(msg, sock) {
     const cmdName = args.shift().toLowerCase();
 
     if (commands[cmdName]) {
-      await commands[cmdName](msg, sock, args);
+      await commands[cmdName](msg, sock, args, sendMessageWithContext);
     } else {
-      await sock.sendMessage(msg.key.remoteJid, {
-        text: `❌ Commande inconnue : ${cmdName}`
-      });
+      await sendMessageWithContext(
+        sock,
+        msg.key.remoteJid,
+        `❌ Commande inconnue : ${cmdName}`,
+        msg
+      );
     }
   } catch (e) {
     console.log("Handler Error:", e);
