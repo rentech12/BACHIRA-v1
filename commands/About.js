@@ -15,7 +15,7 @@ async function about(m, socket) {
 • Jeux et divertissement
 • Et bien plus...
 
-*Source:* https://github.com/rentech/bachira-v1`;
+*Source:* https://github.com/rentech12/BACHIRA-v1`;
   
   await m.reply(aboutText);
 }
