@@ -1,5 +1,8 @@
-export default async function ping(msg, sock) {
-  await sock.sendMessage(msg.key.remoteJid, {
-    text: "🏓 Pong ! Bachira V1 est en ligne."
-  });
+async function ping(m, socket) {
+  const start = Date.now();
+  await m.reply('*Pong!* 🏓');
+  const latency = Date.now() - start;
+  await m.reply(`*Latence:* ${latency}ms\n*Statut:* ✅ En ligne`);
 }
+
+export default ping;
