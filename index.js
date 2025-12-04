@@ -1,6 +1,7 @@
 // 🩸 Bachira-v1 BOT
 // === INDEX PRINCIPAL DU BOT ===
 // Version : v3.0.0 (𝐁𝐚𝐜𝐡𝐢𝐫𝐚-𝐯𝟏 Build Advanced)
+// Contexte : Mon index - voici le lien de ma chaîne pour toutes les commandes https://whatsapp.com/channel/0029VbBaZ6ALo4hb3iDBla2Z
 
 import makeWASocket, {
   useMultiFileAuthState,
@@ -413,6 +414,7 @@ async function startBachira() {
       console.log(chalk.greenBright("===================================="));
       console.log(chalk.greenBright("🩸 BACHIRA-v1 BOT ACTIVÉ 🩸"));
       console.log(chalk.greenBright("✅ Connecté à WhatsApp avec succès !"));
+      console.log(chalk.greenBright("📢 Lien des commandes : https://whatsapp.com/channel/0029VbBaZ6ALo4hb3iDBla2Z"));
       console.log(chalk.greenBright("===================================="));
 
       const ownerId = normalizeJid(sock.user?.id);
@@ -690,7 +692,7 @@ async function startBachira() {
         } else if (args[0] === "remove") {
           const number = args[1];
           config.numbers = config.numbers.filter(n => n !== number);
-          await sock.sendMessage(from, { text: `✅ ${number} retiré de la liste anti-ban` }, { quoted: msg });
+          await sock.sendMessage(from, { text: `✅ ${number} retiré de la liste anti-ban" }, { quoted: msg });
         } else if (args[0] === "list") {
           const list = config.numbers.join("\n");
           await sock.sendMessage(from, { 
@@ -813,14 +815,3 @@ async function startBachira() {
           await commands[cmd].execute(sock, msg, args);
           console.log(chalk.green(`✅ Commande exécutée : ${cmd}`));
         } catch (err) {
-          console.log(chalk.red(`Erreur ${cmd}:`), err);
-          await sock.sendMessage(from, { text: "⚠️ Une erreur est survenue." }, { quoted: msg });
-        }
-      }
-    }
-  });
-}
-
-// === Lancement ===
-startBachira().catch((e) => {
-  console.log
