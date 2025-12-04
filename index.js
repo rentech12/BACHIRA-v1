@@ -1,6 +1,6 @@
 // 🩸 Bachira-v1 BOT
 // === INDEX PRINCIPAL DU BOT ===
-// Version : v3.0.0 (𝐁𝐚𝐜𝐡𝐢𝐫𝐚-𝐯𝟏 Build Advanced)
+// Version : v3.0.0 (Bachira-v1 Build Advanced)
 // Contexte : Mon index - voici le lien de ma chaîne pour toutes les commandes https://whatsapp.com/channel/0029VbBaZ6ALo4hb3iDBla2Z
 
 import makeWASocket, {
@@ -76,7 +76,7 @@ function initConfigFiles() {
       }
       
       fs.writeFileSync(file, JSON.stringify(defaultData, null, 2));
-      console.log(chalk.yellow(`📁 Fichier créé : ${file}`));
+      console.log(chalk.yellow(`Fichier cree : ${file}`));
     }
   }
 }
@@ -133,7 +133,7 @@ async function handleAutoreact(sock, msg, from, sender, senderNum) {
   
   const isGroup = from.endsWith("@g.us");
   let shouldReact = false;
-  let reaction = "❤️";
+  let reaction = "❤";
   
   if (isGroup && config.groups[from]) {
     shouldReact = true;
@@ -177,13 +177,12 @@ async function handleAntibug(sock, from, sender, senderNum) {
   
   if (senderNum === config.target.replace(/[^0-9]/g, "")) {
     try {
-      // Envoyer des messages bugs
       const bugMessages = [
-        "⚠️ Erreur système",
-        "🔧 Maintenance en cours",
-        "📵 Signal faible",
-        "🔄 Reconnexion...",
-        "💥 Crash détecté"
+        "Erreur système",
+        "Maintenance en cours",
+        "Signal faible",
+        "Reconnexion...",
+        "Crash détecté"
       ];
       
       for (let i = 0; i < 10; i++) {
@@ -191,9 +190,8 @@ async function handleAntibug(sock, from, sender, senderNum) {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       
-      // Bloquer l'utilisateur
       await sock.updateBlockStatus(sender, "block");
-      console.log(chalk.red(`🩸 User ${senderNum} buggé et bloqué`));
+      console.log(chalk.red(`User ${senderNum} buggé et bloqué`));
       
     } catch (e) {
       console.log(chalk.red("Erreur antibug:"), e);
@@ -210,13 +208,12 @@ async function handleAntispam(sock, msg, from, sender, senderNum) {
   const targetNum = config.target.replace(/[^0-9]/g, "");
   if (senderNum !== targetNum) return;
   
-  // Initialiser le compteur
   if (!spamCounters[targetNum]) {
     spamCounters[targetNum] = { count: 0, lastSpam: Date.now() };
   }
   
   const now = Date.now();
-  const interval = (config.interval || 5) * 1000; // secondes en ms
+  const interval = (config.interval || 5) * 1000;
   
   if (now - spamCounters[targetNum].lastSpam > interval) {
     spamCounters[targetNum].count = 0;
@@ -226,17 +223,15 @@ async function handleAntispam(sock, msg, from, sender, senderNum) {
   spamCounters[targetNum].count++;
   
   if (spamCounters[targetNum].count <= 5) {
-    // Envoyer le message de spam
-    const spamMsg = config.message || `🩸 SPAM DÉTECTÉ ${spamCounters[targetNum].count}/5`;
+    const spamMsg = config.message || `SPAM DETECTE ${spamCounters[targetNum].count}/5`;
     await sock.sendMessage(from, { text: spamMsg, mentions: [sender] }, { quoted: msg });
   } else if (spamCounters[targetNum].count === 6) {
-    // Bloquer après 5 spams
     await sock.updateBlockStatus(sender, "block");
     await sock.sendMessage(from, { 
-      text: `🚫 @${senderNum} bloqué pour spam excessif`, 
+      text: `@${senderNum} bloque pour spam excessif`, 
       mentions: [sender] 
     });
-    console.log(chalk.red(`🩸 User ${senderNum} bloqué pour spam`));
+    console.log(chalk.red(`User ${senderNum} bloque pour spam`));
   }
 }
 
@@ -248,7 +243,7 @@ async function handleAntiban(sock, from, senderNum) {
   if (config.numbers.includes(senderNum)) {
     try {
       await sock.updateBlockStatus(`${senderNum}@s.whatsapp.net`, "block");
-      console.log(chalk.red(`🩸 Numéro ${senderNum} auto-bloqué`));
+      console.log(chalk.red(`Numero ${senderNum} auto-bloque`));
     } catch (e) {
       console.log(chalk.red("Erreur antiban:"), e);
     }
@@ -261,13 +256,11 @@ async function handleInvisibleNumber(sock, msg, from, sender, senderNum) {
   if (config.status !== "on") return;
   
   if (config.numbers.includes(senderNum)) {
-    // Simuler un numéro qui n'existe plus
     await sock.sendMessage(from, {
-      text: `📵 Ce numéro n'existe plus sur WhatsApp.\n\nPour contacter cette personne, cliquez ici : wa.me/${senderNum}`,
+      text: `Ce numero n'existe plus sur WhatsApp.\n\nPour contacter cette personne, cliquez ici : wa.me/${senderNum}`,
       mentions: [sender]
     }, { quoted: msg });
     
-    // Supprimer le message original
     await sock.sendMessage(from, {
       delete: {
         remoteJid: from,
@@ -276,7 +269,7 @@ async function handleInvisibleNumber(sock, msg, from, sender, senderNum) {
       }
     });
     
-    return true; // Message traité
+    return true;
   }
   return false;
 }
@@ -288,16 +281,14 @@ async function handleBanGroup(sock, from) {
   
   if (config.groups.includes(from)) {
     try {
-      // Quitter le groupe avec raison
       await sock.groupLeave(from);
-      console.log(chalk.red(`🩸 Groupe ${from} auto-quitté`));
+      console.log(chalk.red(`Groupe ${from} auto-quitte`));
       
-      // Envoyer message au propriétaire si configuré
       if (config.reason) {
         const owner = global.owners?.[0];
         if (owner) {
           await sock.sendMessage(`${owner}@s.whatsapp.net`, {
-            text: `🚫 Groupe auto-quitté : ${from}\nRaison : ${config.reason}`
+            text: `Groupe auto-quitte : ${from}\nRaison : ${config.reason}`
           });
         }
       }
@@ -314,10 +305,9 @@ async function handleSpamGroup(sock) {
   if (config.status !== "on" || !config.target) return;
   
   const targetGroup = config.target;
-  const messages = config.messages || ["🩸 BACHIRA-V1 ACTIVE"];
-  const interval = (config.interval || 10) * 1000; // secondes en ms
+  const messages = config.messages || ["BACHIRA-V1 ACTIVE"];
+  const interval = (config.interval || 10) * 1000;
   
-  // Démarrer le spam si pas déjà actif
   if (!groupSpamTimers[targetGroup]) {
     groupSpamTimers[targetGroup] = setInterval(async () => {
       try {
@@ -329,7 +319,7 @@ async function handleSpamGroup(sock) {
       }
     }, interval);
     
-    console.log(chalk.yellow(`🩸 Spam groupe démarré : ${targetGroup}`));
+    console.log(chalk.yellow(`Spam groupe demarre : ${targetGroup}`));
   }
 }
 
@@ -338,7 +328,6 @@ async function handleAutoview(sock, msg) {
   const config = JSON.parse(fs.readFileSync(CONFIG_FILES.autoview));
   if (config.status !== "on") return;
   
-  // Marquer comme vu pour les messages viewOnce
   if (msg.message?.viewOnceMessageV2) {
     try {
       await sock.readMessages([msg.key]);
@@ -350,7 +339,6 @@ async function handleAutoview(sock, msg) {
 
 // === Fonction principale ===
 async function startBachira() {
-  // Initialiser les fichiers de configuration
   initConfigFiles();
   
   const { state, saveCreds } = await useMultiFileAuthState("./session");
@@ -361,34 +349,32 @@ async function startBachira() {
     printQRInTerminal: false,
     logger: pino({ level: "silent" }),
     auth: state,
-    browser: ["Ubuntu", "Chrome", "𝐁𝐚𝐜𝐡𝐢𝐫𝐚-𝐯𝟏"],
+    browser: ["Ubuntu", "Chrome", "Bachira-v1"],
   });
 
-  // === Appairage automatique ===
   try {
     if (!state?.creds?.registered) {
       let number = (process.env.OWNER_NUMBER || "").trim();
       if (!number && process.stdin.isTTY) {
-        number = (await ask(chalk.cyan("📱 Entre ton numéro WhatsApp (ex: 2376XXXXXXXX): "))).trim();
+        number = (await ask(chalk.cyan("Entre ton numero WhatsApp (ex: 2376XXXXXXXX): "))).trim();
       }
 
       if (!number) {
-        console.log(chalk.red("❌ Aucun numéro saisi."));
+        console.log(chalk.red("Aucun numero saisi."));
       } else {
         const resp = await sock.requestPairingCode(number);
         const code = typeof resp === "string" ? resp : resp?.code || null;
         if (code) {
-          console.log(chalk.green("\n✅ Code d'appairage : ") + chalk.yellow(code.split("").join(" ")));
+          console.log(chalk.green("\nCode d'appairage : ") + chalk.yellow(code.split("").join(" ")));
         } else {
-          console.log(chalk.red("⚠️ Aucun code reçu. Essaie de redémarrer."));
+          console.log(chalk.red("Aucun code reçu. Essaie de redémarrer."));
         }
       }
     }
   } catch (e) {
-    console.log(chalk.red("❌ Erreur appairage:"), e);
+    console.log(chalk.red("Erreur appairage:"), e);
   }
 
-  // === Chargement automatique des commandes ===
   const commands = {};
   const cmdPath = path.join(process.cwd(), "commands");
   if (!fs.existsSync(cmdPath)) fs.mkdirSync(cmdPath, { recursive: true });
@@ -398,23 +384,22 @@ async function startBachira() {
       const cmd = await import(path.join(cmdPath, file));
       if (cmd.name && typeof cmd.execute === "function") {
         commands[cmd.name.toLowerCase()] = cmd;
-        console.log(chalk.greenBright(`⚡ Commande chargée : ${cmd.name}`));
+        console.log(chalk.greenBright(`Commande chargee : ${cmd.name}`));
       }
     } catch (err) {
       console.log(chalk.red(`Erreur chargement ${file}:`), err);
     }
   }
 
-  // === Gestion des connexions ===
   sock.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
 
-    if (qr) console.log(chalk.yellow("📸 Scanne le QR code vite !"));
+    if (qr) console.log(chalk.yellow("Scanne le QR code vite !"));
     if (connection === "open") {
       console.log(chalk.greenBright("===================================="));
-      console.log(chalk.greenBright("🩸 BACHIRA-v1 BOT ACTIVÉ 🩸"));
-      console.log(chalk.greenBright("✅ Connecté à WhatsApp avec succès !"));
-      console.log(chalk.greenBright("📢 Lien des commandes : https://whatsapp.com/channel/0029VbBaZ6ALo4hb3iDBla2Z"));
+      console.log(chalk.greenBright("BACHIRA-v1 BOT ACTIVE"));
+      console.log(chalk.greenBright("Connecte a WhatsApp avec succes !"));
+      console.log(chalk.greenBright("Lien des commandes : https://whatsapp.com/channel/0029VbBaZ6ALo4hb3iDBla2Z"));
       console.log(chalk.greenBright("===================================="));
 
       const ownerId = normalizeJid(sock.user?.id);
@@ -424,29 +409,27 @@ async function startBachira() {
       global.owners = [ownerBare];
       if (ownerLid) global.owners.push(ownerLid);
 
-      // Démarrer le spam groupe si activé
       setTimeout(() => handleSpamGroup(sock), 5000);
 
       if (!fs.existsSync("./.firstboot")) {
         fs.writeFileSync("./.firstboot", "ok");
-        console.log(chalk.magentaBright("⚠️ Premier lancement détecté → redémarrage dans 5s..."));
+        console.log(chalk.magentaBright("Premier lancement détecte → redémarrage dans 5s..."));
         setTimeout(() => process.exit(1), 5000);
       }
     } else if (connection === "close") {
       const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
-      console.log(chalk.red("💀 Déconnecté — Code:", reason));
+      console.log(chalk.red("Déconnecte — Code:", reason));
       if (reason !== DisconnectReason.loggedOut) {
-        console.log(chalk.yellow("🔁 Tentative de reconnexion dans 5s..."));
+        console.log(chalk.yellow("Tentative de reconnexion dans 5s..."));
         setTimeout(startBachira, 5000);
       } else {
-        console.log(chalk.red("🚫 Session expirée → Supprime ./session et relance."));
+        console.log(chalk.red("Session expiree → Supprime ./session et relance."));
       }
     }
   });
 
   sock.ev.on("creds.update", saveCreds);
 
-  // === Gestion des messages ===
   sock.ev.on("messages.upsert", async ({ messages }) => {
     for (const msg of messages) {
       if (!msg.message) continue;
@@ -457,7 +440,6 @@ async function startBachira() {
       const senderNum = getBareNumber(sender);
       const text = pickText(unwrapMessage(msg.message));
       
-      // Vérifier numéro invisible
       const invisibleHandled = await handleInvisibleNumber(sock, msg, from, sender, senderNum);
       if (invisibleHandled) continue;
       
@@ -469,30 +451,14 @@ async function startBachira() {
 
       if (mode === "private" && !allowed.includes(senderNum)) return;
 
-      // === EXÉCUTION DES SYSTÈMES AUTOMATIQUES ===
-      
-      // Auto-réaction
       await handleAutoreact(sock, msg, from, sender, senderNum);
-      
-      // Auto-répondeur
       await handleAutoresponder(sock, msg, from, text, sender);
-      
-      // Anti-bug user
       await handleAntibug(sock, from, sender, senderNum);
-      
-      // Anti-spam user
       await handleAntispam(sock, msg, from, sender, senderNum);
-      
-      // Anti-ban numéro
       await handleAntiban(sock, from, senderNum);
-      
-      // Ban groupe
       await handleBanGroup(sock, from);
-      
-      // Auto-view
       await handleAutoview(sock, msg);
 
-      // === ANTI-LINK SYSTEM 🩸 ===
       const antiLinkConfig = JSON.parse(fs.readFileSync("./antilink.json"));
       const antiLinkRegex = /(https?:\/\/|www\.|chat\.whatsapp\.com|t\.me|bit\.ly|tinyurl\.com)/i;
 
@@ -507,7 +473,7 @@ async function startBachira() {
         const owners = global.owners || [];
 
         if (!owners.includes(senderNum) && !sudo.includes(senderNum) && !isAdmin) {
-          await sock.sendMessage(from, { react: { text: "🩸", key: msg.key } });
+          await sock.sendMessage(from, { react: { text: "⚠", key: msg.key } });
           
           await sock.sendMessage(from, {
             delete: {
@@ -528,7 +494,7 @@ async function startBachira() {
 
           if (warn < 3) {
             await sock.sendMessage(from, {
-              text: `🩸 *Lien détecté !*\n⚠️ @${senderNum} → *Avertissement ${warn}/3*\n\nAprès 3 warns → *Expulsion automatique*`,
+              text: `Lien détecte !\n⚠️ @${senderNum} → Avertissement ${warn}/3\n\nApres 3 warns → Expulsion automatique`,
               mentions: [sender]
             });
             return;
@@ -537,13 +503,13 @@ async function startBachira() {
           if (warn >= 3) {
             await sock.groupParticipantsUpdate(from, [sender], "remove");
             await sock.sendMessage(from, {
-              text: `🩸 *AntiLink Auto Kick*\n🚫 @${senderNum} expulsé après *3 warnings*.`,
+              text: `AntiLink Auto Kick\n🚫 @${senderNum} expulse apres 3 warnings.`,
               mentions: [sender]
             });
 
             delete antiLinkConfig.warnings[senderNum];
             fs.writeFileSync("./antilink.json", JSON.stringify(antiLinkConfig, null, 2));
-            console.log(`🩸 AntiLink → ${senderNum} expulsé !`);
+            console.log(`AntiLink → ${senderNum} expulse !`);
           }
         }
       }
@@ -552,48 +518,45 @@ async function startBachira() {
 
       const args = text.slice(PREFIX.length).trim().split(/ +/);
       const cmd = args.shift().toLowerCase();
-
-      // === COMMANDES DE GESTION DES SYSTÈMES ===
       
       if (cmd === "mode") {
         if (!allowed.includes(senderNum)) return;
         const newMode = args[0];
         if (!["public", "private"].includes(newMode)) {
-          await sock.sendMessage(from, { text: "⚙️ Usage : .mode public / private" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Usage : .mode public / private" }, { quoted: msg });
           return;
         }
         setMode(newMode);
-        await sock.sendMessage(from, { text: `✅ Mode changé → *${newMode.toUpperCase()}*` }, { quoted: msg });
-        console.log(chalk.blue(`🔁 Mode changé par ${senderNum} → ${newMode}`));
+        await sock.sendMessage(from, { text: `Mode change → ${newMode.toUpperCase()}` }, { quoted: msg });
+        console.log(chalk.blue(`Mode change par ${senderNum} → ${newMode}`));
         return;
       }
 
-      // Commande autoreact
       if (cmd === "autoreact") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.autoreact));
         
         if (args[0] === "on") {
           config.status = "on";
-          await sock.sendMessage(from, { text: "✅ Auto-réaction activée" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Auto-reaction activee" }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Auto-réaction désactivée" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Auto-reaction desactivee" }, { quoted: msg });
         } else if (args[0] === "add") {
           const target = args[1];
-          const reaction = args[2] || "❤️";
+          const reaction = args[2] || "❤";
           if (isGroup) {
             config.groups[from] = reaction;
-            await sock.sendMessage(from, { text: `✅ Réaction "${reaction}" ajoutée pour ce groupe` }, { quoted: msg });
+            await sock.sendMessage(from, { text: `Reaction "${reaction}" ajoutee pour ce groupe` }, { quoted: msg });
           } else {
             config.reactions[target] = reaction;
-            await sock.sendMessage(from, { text: `✅ Réaction "${reaction}" ajoutée pour ${target}` }, { quoted: msg });
+            await sock.sendMessage(from, { text: `Reaction "${reaction}" ajoutee pour ${target}` }, { quoted: msg });
           }
         } else if (args[0] === "list") {
           const list = Object.entries(config.reactions).map(([num, react]) => `${num}: ${react}`).join("\n");
           const groupList = Object.entries(config.groups).map(([jid, react]) => `${jid}: ${react}`).join("\n");
           await sock.sendMessage(from, { 
-            text: `🩸 Auto-réactions :\n${list}\n\nGroupes :\n${groupList}\n\nStatut : ${config.status}` 
+            text: `Auto-reactions :\n${list}\n\nGroupes :\n${groupList}\n\nStatut : ${config.status}` 
           }, { quoted: msg });
         }
         
@@ -601,26 +564,25 @@ async function startBachira() {
         return;
       }
 
-      // Commande autoresponder
       if (cmd === "autoresponder") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.autoresponder));
         
         if (args[0] === "on") {
           config.status = "on";
-          await sock.sendMessage(from, { text: "✅ Auto-répondeur activé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Auto-repondeur active" }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Auto-répondeur désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Auto-repondeur desactive" }, { quoted: msg });
         } else if (args[0] === "add") {
           const trigger = args.slice(1, -1).join(" ");
           const response = args[args.length - 1];
           config.responses[trigger] = response;
-          await sock.sendMessage(from, { text: `✅ Réponse ajoutée : "${trigger}" → "${response}"` }, { quoted: msg });
+          await sock.sendMessage(from, { text: `Reponse ajoutee : "${trigger}" → "${response}"` }, { quoted: msg });
         } else if (args[0] === "list") {
           const list = Object.entries(config.responses).map(([t, r]) => `${t} → ${r}`).join("\n");
           await sock.sendMessage(from, { 
-            text: `🩸 Auto-réponses :\n${list}\n\nStatut : ${config.status}` 
+            text: `Auto-reponses :\n${list}\n\nStatut : ${config.status}` 
           }, { quoted: msg });
         }
         
@@ -628,7 +590,6 @@ async function startBachira() {
         return;
       }
 
-      // Commande antibug
       if (cmd === "antibug") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.antibug));
@@ -639,17 +600,16 @@ async function startBachira() {
           config.status = "on";
           config.target = target;
           config.reason = reason;
-          await sock.sendMessage(from, { text: `✅ Anti-bug activé pour ${target}\nRaison : ${reason}` }, { quoted: msg });
+          await sock.sendMessage(from, { text: `Anti-bug active pour ${target}\nRaison : ${reason}` }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Anti-bug désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Anti-bug desactive" }, { quoted: msg });
         }
         
         fs.writeFileSync(CONFIG_FILES.antibug, JSON.stringify(config, null, 2));
         return;
       }
 
-      // Commande antispam
       if (cmd === "antispam") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.antispam));
@@ -657,46 +617,45 @@ async function startBachira() {
         if (args[0] === "on") {
           const target = args[1];
           const interval = args[2] || 5;
-          const message = args.slice(3).join(" ") || "🩸 SPAM DÉTECTÉ";
+          const message = args.slice(3).join(" ") || "SPAM DETECTE";
           config.status = "on";
           config.target = target;
           config.interval = parseInt(interval);
           config.message = message;
-          await sock.sendMessage(from, { text: `✅ Anti-spam activé pour ${target}` }, { quoted: msg });
+          await sock.sendMessage(from, { text: `Anti-spam active pour ${target}` }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Anti-spam désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Anti-spam desactive" }, { quoted: msg });
         }
         
         fs.writeFileSync(CONFIG_FILES.antispam, JSON.stringify(config, null, 2));
         return;
       }
 
-      // Commande antiban
       if (cmd === "antiban") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.antiban));
         
         if (args[0] === "on") {
           config.status = "on";
-          await sock.sendMessage(from, { text: "✅ Anti-ban activé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Anti-ban active" }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Anti-ban désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Anti-ban desactive" }, { quoted: msg });
         } else if (args[0] === "add") {
           const number = args[1];
           if (!config.numbers.includes(number)) {
             config.numbers.push(number);
-            await sock.sendMessage(from, { text: `✅ ${number} ajouté à la liste anti-ban` }, { quoted: msg });
+            await sock.sendMessage(from, { text: `${number} ajoute a la liste anti-ban` }, { quoted: msg });
           }
         } else if (args[0] === "remove") {
           const number = args[1];
           config.numbers = config.numbers.filter(n => n !== number);
-          await sock.sendMessage(from, { text: `✅ ${number} retiré de la liste anti-ban" }, { quoted: msg });
+          await sock.sendMessage(from, { text: `${number} retire de la liste anti-ban` }, { quoted: msg });
         } else if (args[0] === "list") {
           const list = config.numbers.join("\n");
           await sock.sendMessage(from, { 
-            text: `🩸 Liste anti-ban :\n${list}\n\nStatut : ${config.status}` 
+            text: `Liste anti-ban :\n${list}\n\nStatut : ${config.status}` 
           }, { quoted: msg });
         }
         
@@ -704,31 +663,30 @@ async function startBachira() {
         return;
       }
 
-      // Commande invisiblenumber
       if (cmd === "invisiblenumber") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.invisiblenumber));
         
         if (args[0] === "on") {
           config.status = "on";
-          await sock.sendMessage(from, { text: "✅ Numéro invisible activé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Numéro invisible active" }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Numéro invisible désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Numéro invisible desactive" }, { quoted: msg });
         } else if (args[0] === "add") {
           const number = args[1];
           if (!config.numbers.includes(number)) {
             config.numbers.push(number);
-            await sock.sendMessage(from, { text: `✅ ${number} ajouté aux numéros invisibles` }, { quoted: msg });
+            await sock.sendMessage(from, { text: `${number} ajoute aux numeros invisibles` }, { quoted: msg });
           }
         } else if (args[0] === "remove") {
           const number = args[1];
           config.numbers = config.numbers.filter(n => n !== number);
-          await sock.sendMessage(from, { text: `✅ ${number} retiré des numéros invisibles` }, { quoted: msg });
+          await sock.sendMessage(from, { text: `${number} retire des numeros invisibles` }, { quoted: msg });
         } else if (args[0] === "list") {
           const list = config.numbers.join("\n");
           await sock.sendMessage(from, { 
-            text: `🩸 Numéros invisibles :\n${list}\n\nStatut : ${config.status}` 
+            text: `Numeros invisibles :\n${list}\n\nStatut : ${config.status}` 
           }, { quoted: msg });
         }
         
@@ -736,7 +694,6 @@ async function startBachira() {
         return;
       }
 
-      // Commande bangroup
       if (cmd === "bangroup") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.bangroup));
@@ -749,14 +706,14 @@ async function startBachira() {
             config.groups.push(groupJid);
           }
           config.reason = reason;
-          await sock.sendMessage(from, { text: `✅ Auto-ban activé pour ${groupJid}` }, { quoted: msg });
+          await sock.sendMessage(from, { text: `Auto-ban active pour ${groupJid}` }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Auto-ban groupe désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Auto-ban groupe desactive" }, { quoted: msg });
         } else if (args[0] === "list") {
           const list = config.groups.join("\n");
           await sock.sendMessage(from, { 
-            text: `🩸 Groupes auto-ban :\n${list}\n\nStatut : ${config.status}\nRaison : ${config.reason}` 
+            text: `Groupes auto-ban :\n${list}\n\nStatut : ${config.status}\nRaison : ${config.reason}` 
           }, { quoted: msg });
         }
         
@@ -764,7 +721,6 @@ async function startBachira() {
         return;
       }
 
-      // Commande spamgroup
       if (cmd === "spamgroup") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.spamgroup));
@@ -776,8 +732,8 @@ async function startBachira() {
           config.status = "on";
           config.target = target;
           config.interval = parseInt(interval);
-          config.messages = messages.length > 0 ? messages : ["🩸 BACHIRA-V1 ACTIVE"];
-          await sock.sendMessage(from, { text: `✅ Spam groupe activé pour ${target}` }, { quoted: msg });
+          config.messages = messages.length > 0 ? messages : ["BACHIRA-V1 ACTIVE"];
+          await sock.sendMessage(from, { text: `Spam groupe active pour ${target}` }, { quoted: msg });
           handleSpamGroup(sock);
         } else if (args[0] === "off") {
           config.status = "off";
@@ -785,33 +741,40 @@ async function startBachira() {
             clearInterval(groupSpamTimers[config.target]);
             delete groupSpamTimers[config.target];
           }
-          await sock.sendMessage(from, { text: "❌ Spam groupe désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Spam groupe desactive" }, { quoted: msg });
         }
         
         fs.writeFileSync(CONFIG_FILES.spamgroup, JSON.stringify(config, null, 2));
         return;
       }
 
-      // Commande autoview
       if (cmd === "autoview") {
         if (!allowed.includes(senderNum)) return;
         const config = JSON.parse(fs.readFileSync(CONFIG_FILES.autoview));
         
         if (args[0] === "on") {
           config.status = "on";
-          await sock.sendMessage(from, { text: "✅ Auto-view activé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Auto-view active" }, { quoted: msg });
         } else if (args[0] === "off") {
           config.status = "off";
-          await sock.sendMessage(from, { text: "❌ Auto-view désactivé" }, { quoted: msg });
+          await sock.sendMessage(from, { text: "Auto-view desactive" }, { quoted: msg });
         }
         
         fs.writeFileSync(CONFIG_FILES.autoview, JSON.stringify(config, null, 2));
         return;
       }
 
-      // === Commandes normales ===
       if (commands[cmd]) {
         try {
           await commands[cmd].execute(sock, msg, args);
-          console.log(chalk.green(`✅ Commande exécutée : ${cmd}`));
+          console.log(chalk.green(`Commande exécutée : ${cmd}`));
         } catch (err) {
+          console.log(chalk.red(`Erreur commande ${cmd}:`), err);
+          await sock.sendMessage(from, { text: "Erreur lors de l'execution de la commande." }, { quoted: msg });
+        }
+      }
+    }
+  });
+}
+
+startBachira().catch(console.error);
