@@ -1,22 +1,45 @@
 {
   "name": "bachira-v1",
   "version": "1.0.0",
-  "description": "Bot WhatsApp Bachira V1",
-  "main": "main.js",
+  "description": "🤖 bachira V1 — Bot WhatsApp Baileys Multi-Commandes Puissant & Élégant 🔥",
+  "main": "index.js",
   "type": "module",
+  "author": "REN TECH",
+  "license": "MIT",
   "scripts": {
-    "start": "node main.js",
-    "dev": "nodemon main.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.4.0",
-    "qrcode-terminal": "^0.12.0",
-    "pino": "^8.15.0",
-    "axios": "^1.6.0",
-    "moment-timezone": "^0.5.43",
-    "fs-extra": "^11.1.1"
+    "@adiwajshing/keyed-db": "^0.2.4",
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^6.7.5",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "pino": "^9.3.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
-  }
+    "nodemon": "^3.1.7"
+  },
+  "keywords": [
+    "whatsapp-bot",
+    "baileys",
+    "bachira-bot",
+    "bot-whatsapp",
+    "multi-device",
+    "bachira-v1",
+    "whatsapp-automation"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rentech12/BACHIRA-v1"
+  },
+  "bugs": {
+    "url": "https://github.com/rentech12?tab=repositories"
+  },
+  "homepage": "https://github.com/rentech12/BACHIRA-v1/blob/main/README.md"
 }
