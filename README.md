@@ -1,7 +1,7 @@
 # 🤖 MEGURU — V1 WhatsApp Bot
 
 <p align="center">
-  <img src="https://files.catbox.moe/c8nfbm.jpeg" alt="MEGURU-V1 Banner" width="100%">
+  <img src="https://files.catbox.moe/n74qlh.png" alt="MEGURU-V1 Banner" width="100%">
 </p>
 
 **MEGURU-V1** is a WhatsApp bot built with **Node.js and Baileys**.  
@@ -13,7 +13,7 @@ The bot uses an **online session system**, avoiding local QR scans and simplifyi
 ## 🌐 Session Generator
 
 <p align="center">
-  <a href="https://kaya-session-id.vercel.app" target="_blank">
+  <a href="https://meguru-session-id.vercel.app" target="_blank">
     <button style="padding:12px 20px;font-size:16px;border:none;border-radius:8px;background:#28a745;color:white;cursor:pointer;">
       🔐 Generate WhatsApp Session
     </button>
@@ -43,7 +43,7 @@ Connect your bot using **Pair Code or QR Code**.
 ## 📺 YouTube Tutorials
 
 <p align="center">
-  <a href="https://www.youtube.com/@TECHword-1" target="_blank">
+  <a href="https://www.youtube.com/@Lordsatoru040" target="_blank">
     <button style="padding:12px 20px;font-size:16px;border:none;border-radius:8px;background:#ff0000;color:white;cursor:pointer;">
       ▶️ Visit YouTube Channel
     </button>
@@ -61,7 +61,7 @@ Tutorials include:
 ## 📲 Official WhatsApp Channel
 
 <p align="center">
-  <a href="https://whatsapp.com/channel/0029Vb6FFPM002T3SKA6bb2D" target="_blank">
+  <a href="https://whatsapp.com/channel/0029VbBy5o5It5s4zZZRgo1y" target="_blank">
     <button style="padding:12px 20px;font-size:16px;border:none;border-radius:8px;background:#25D366;color:white;cursor:pointer;">
       💬 Join WhatsApp Channel
     </button>
@@ -88,16 +88,16 @@ The user is responsible for using this bot in compliance with **WhatsApp’s Ter
 
 ## 👑 Author
 
-**KAYA TECH**  
-Creator of **KAYA-MD**
+**𝐌ꝛ 𝐑𝐄𝐍 𝚨𝚻𝚨𝚳𝚵**  
+Creator of **MEGURU-V1**
 
 <p align="center">
-  <a href="https://www.youtube.com/@TECHword-1" target="_blank">
+  <a href="https://www.youtube.com/@Lordsatoru040" target="_blank">
     <button style="padding:10px 18px;margin:5px;border:none;border-radius:8px;background:#ff0000;color:white;">
       📺 YouTube
     </button>
   </a>
-  <a href="https://whatsapp.com/channel/0029Vb6FFPM002T3SKA6bb2D" target="_blank">
+  <a href="https://whatsapp.com/channel/0029VbBy5o5It5s4zZZRgo1y" target="_blank">
     <button style="padding:10px 18px;margin:5px;border:none;border-radius:8px;background:#25D366;color:white;">
       📲 WhatsApp Channel
     </button>
