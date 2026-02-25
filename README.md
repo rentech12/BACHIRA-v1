@@ -1,7 +1,7 @@
 # 🤖 MEGURU — V1 WhatsApp Bot
 
 <p align="center">
-  <img src="https://files.catbox.moe/zcg6kh.jpg" alt="KAYA-MD Banner" width="100%">
+  <img src="https://files.catbox.moe/c8nfbm.jpg" alt="MEGURU-V1 Banner" width="100%">
 </p>
 
 **MEGURU-V1** is a WhatsApp bot built with **Node.js and Baileys**.  
