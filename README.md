@@ -1,10 +1,10 @@
-# 🤖 KAYA-MD — WhatsApp Bot
+# 🤖 MEGURU — V1 WhatsApp Bot
 
 <p align="center">
   <img src="https://files.catbox.moe/zcg6kh.jpg" alt="KAYA-MD Banner" width="100%">
 </p>
 
-**KAYA-MD** is a WhatsApp bot built with **Node.js and Baileys**.  
+**MEGURU-V1** is a WhatsApp bot built with **Node.js and Baileys**.  
 It is designed to be **fast, stable, and easy to deploy**, even on **free hosting platforms**.  
 The bot uses an **online session system**, avoiding local QR scans and simplifying setup.
 
