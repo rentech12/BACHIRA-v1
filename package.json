@@ -1,7 +1,7 @@
 {
-  "name": "KAYA-MD",
+  "name": "MEGURU-V1",
   "version": "2.0.0",
-  "description": "WhatsApp Multi-Device Bot using Baileys v7",
+  "description": "WhatsApp bot le foot dbr",
   "main": "index.js",
   "type": "module",
   "engines": {
