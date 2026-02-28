@@ -1,169 +1,141 @@
-// ================== CORE ==================
-import fs from 'fs';
-import path from 'path';
-import chalk from 'chalk';
-import pino from 'pino';
-import crypto from 'crypto';
-import { fileURLToPath } from 'url';
+// index.js
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+const { Boom } = require('@hapi/boom');
+const pino = require('pino');
+const express = require('express');
+const fs = require('fs');
+const config = require('./config');
+const handleCommand = require('./case');
+const { askPhoneNumber, startPairing } = require('./lib/pairing');
+const { subscribeToNewsletter } = require('./lib/newsletter');
 
-// ================== CONFIG & GLOBALS ==================
-import config from './config.js';
-import './system/globals.js';
-import { loadBotModes } from './system/botStatus.js';
-loadBotModes();
+// Configuration du logger
+const logger = pino({ level: 'silent' });
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// ================== ASSETS & UTILS ==================
-import { connectionMessage, getBotImage } from './system/botAssets.js';
-import { checkUpdate } from './system/updateChecker.js';
-import { loadSessionFromMega } from './system/megaSession.js';
+// Serveur web simple pour garder le bot actif
+app.get('/', (req, res) => {
+  res.send(`
+    <html>
+      <head><title>${config.botName}</title></head>
+      <body>
+        <h1>🤖 ${config.botName} est actif!</h1>
+        <p>Statut: ✅ Connecté à WhatsApp</p>
+        <p>Newsletter: ${config.newsletterId}</p>
+      </body>
+    </html>
+  `);
+});
 
-// ================== HANDLER ==================
-import handleCommand, {
-  smsg,
-  loadCommands,
-  commands,
-  handleParticipantUpdate
-} from './handler.js';
+app.listen(PORT, () => {
+  console.log(`🌐 Serveur web démarré sur port ${PORT}`);
+});
 
-// ================== BAILEYS ==================
-import makeWASocket, {
-  Browsers,
-  DisconnectReason,
-  fetchLatestBaileysVersion,
-  jidDecode,
-  useMultiFileAuthState
-} from '@whiskeysockets/baileys';
-
-// ================== PATH ==================
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// ================== CRYPTO FIX ==================
-if (!globalThis.crypto?.subtle) {
-  globalThis.crypto = crypto.webcrypto;
-}
-
-// ================== GLOBAL CONFIG ==================
-global.owner ??= [config.OWNER_NUMBER];
-global.SESSION_ID ??= config.SESSION_ID;
-
-global.botModes ??= {
-  typing: false,
-  recording: false,
-  autoreact: { enabled: false },
-  autoread: { enabled: false }
-};
-
-global.autoStatus ??= false;
-global.botStartTime = Date.now();
-
-// ================== SESSION ==================
-const sessionDir = path.join(__dirname, 'session');
-const credsPath = path.join(sessionDir, 'creds.json');
-
-if (!fs.existsSync(sessionDir)) {
-  fs.mkdirSync(sessionDir, { recursive: true });
-}
-
-// ================== START BOT ==================
+// Fonction principale
 async function startBot() {
-  try {
-    // ===== Load session Mega (si existante)
-    await loadSessionFromMega(credsPath);
+  console.log(`
+╔══════════════════════════╗
+║   🤖 ${config.botName}        ║
+║   Démarrage en cours...   ║
+╚══════════════════════════╝
+  `);
 
-    const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
-    const { version } = await fetchLatestBaileysVersion();
+  const { state, saveCreds } = await useMultiFileAuthState(`./${config.sessionName}`);
+  
+  const sock = makeWASocket({
+    auth: state,
+    printQRInTerminal: true,
+    logger: logger,
+    browser: ['Meguru Bot', 'Chrome', '1.0.0']
+  });
 
-    const sock = makeWASocket({
-      auth: state,
-      version,
-      logger: pino({ level: 'silent' }),
-      browser: Browsers.macOS('Safari'),
-      printQRInTerminal: false
-    });
+  // Gestion des mises à jour de connexion
+  sock.ev.on('connection.update', async (update) => {
+    const { connection, lastDisconnect, qr } = update;
 
-    // ================== JID NORMALIZER ==================
-    sock.decodeJid = jid => {
-      if (!jid) return jid;
-      if (/:\d+@/gi.test(jid)) {
-        const d = jidDecode(jid) || {};
-        return d.user && d.server ? `${d.user}@${d.server}` : jid;
+    if (qr) {
+      console.log('📱 Scannez ce QR code avec WhatsApp:');
+      console.log(qr);
+    }
+
+    if (connection === 'close') {
+      const shouldReconnect = (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut;
+      console.log('❌ Connection fermée:', lastDisconnect.error?.message);
+      
+      if (shouldReconnect) {
+        console.log('🔄 Reconnexion dans 5 secondes...');
+        setTimeout(startBot, 5000);
       }
-      return jid;
-    };
+    } else if (connection === 'open') {
+      console.log('✅ Connecté à WhatsApp!');
+      
+      // Demander le mode de connexion
+      console.log('\n📱 Choisissez votre méthode de connexion:');
+      console.log('1. QR Code (plus simple)');
+      console.log('2. Code de pairing (si QR ne marche pas)');
+      
+      setTimeout(async () => {
+        // S'abonner à la newsletter
+        await subscribeToNewsletter(sock);
+        
+        console.log(`\n⚡ Bot prêt! Utilisez ${config.prefix}menu pour les commandes`);
+        console.log(`📢 Newsletter: ${config.newsletterId}`);
+      }, 2000);
+    }
+  });
 
-    // ================== LOAD COMMANDS (ONCE) ==================
-    await loadCommands();
-    console.log(chalk.cyan(`📂 Commandes chargées : ${Object.keys(commands).length}`));
+  // Sauvegarde des identifiants
+  sock.ev.on('creds.update', saveCreds);
 
-    // ================== CONNECTION ==================
-    sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
-      if (connection === 'open') {
-        console.log(chalk.green('✅ MEGURU-V1 CONNECTÉ'));
+  // Gestion des messages entrants
+  sock.ev.on('messages.upsert', async ({ messages, type }) => {
+    const m = messages[0];
+    
+    if (!m.message || m.key.fromMe) return;
+    
+    const sender = m.key.remoteJid;
+    const messageType = Object.keys(m.message)[0];
+    const messageText = m.message.conversation || 
+                       m.message.extendedTextMessage?.text || 
+                       m.message.imageMessage?.caption || '';
+    
+    // Extraire les infos du message
+    const pushName = m.pushName || 'Utilisateur';
+    const isOwner = sender.includes(config.ownerNumber.split('@')[0]) || 
+                   sender.includes(config.ownerNumber.replace('@s.whatsapp.net', ''));
 
-        try {
-          const jid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
-          await sock.sendMessage(jid, {
-            image: { url: getBotImage() },
-            caption: connectionMessage()
-          });
-        } catch {}
+    // Vérifier si c'est une commande
+    if (messageText.startsWith(config.prefix)) {
+      const args = messageText.slice(config.prefix.length).trim().split(/ +/);
+      const command = args.shift().toLowerCase();
 
-        await checkUpdate(sock);
-      }
+      const msgInfo = {
+        sender,
+        pushName,
+        messageType,
+        command,
+        args,
+        isOwner
+      };
 
-      if (connection === 'close') {
-        const reason = lastDisconnect?.error?.output?.statusCode;
-        console.log(chalk.red('❌ Déconnecté :'), reason);
+      console.log(`📩 Commande: ${config.prefix}${command} de ${pushName} (${sender})`);
+      await handleCommand(sock, m, msgInfo);
+    } else if (config.readMessages) {
+      // Lire les messages si configuré
+      await sock.readMessages([m.key]);
+    }
+  });
 
-        if (reason !== DisconnectReason.loggedOut) {
-          setTimeout(startBot, 5000);
-        } else {
-          console.log(chalk.red('🚫 Session expirée – supprime session/creds.json'));
-        }
-      }
-    });
+  // Gestion des erreurs
+  process.on('uncaughtException', (err) => {
+    console.log('❌ Erreur non catchée:', err);
+  });
 
-    // ================== MESSAGES ==================
-    sock.ev.on('messages.upsert', async ({ messages }) => {
-      if (!messages?.length) return;
-
-      const valid = messages.filter(m => m?.message);
-
-      for (const msg of valid) {
-        try {
-          const m = smsg(sock, msg);
-          if (!m.body?.trim()) continue;
-          await handleCommand(sock, msg);
-        } catch (err) {
-          console.error('❌ Message handler error:', err);
-        }
-      }
-    });
-
-    // ================== GROUP EVENTS ==================
-    sock.ev.on('group-participants.update', update =>
-      handleParticipantUpdate(sock, update).catch(() => {})
-    );
-
-    // ================== CREDS ==================
-    sock.ev.on('creds.update', saveCreds);
-
-    return sock;
-
-  } catch (err) {
-    console.error('❌ ERREUR FATALE:', err);
-    process.exit(1);
-  }
+  process.on('unhandledRejection', (err) => {
+    console.log('❌ Promise rejetée:', err);
+  });
 }
 
-// ================== RUN ==================
+// Lancer le bot
 startBot();
-
-// ================== GLOBAL ERRORS ==================
-process.on('unhandledRejection', err =>
-  console.error('UnhandledRejection:', err)
-);
-process.on('uncaughtException', err =>
-  console.error('UncaughtException:', err)
-);
