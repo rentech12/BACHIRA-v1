@@ -109,7 +109,7 @@ export default {
           }
 
           await setAntitag(chatId, true, mode);
-          return kaya.sendMessage(
+          return meguru.sendMessage(
             chatId,
             { text: `⚙️ Antitag action set to: ${mode.toUpperCase()}`, contextInfo },
             { quoted: m }
@@ -117,7 +117,7 @@ export default {
         }
 
         default:
-          return kaya.sendMessage(
+          return meguru.sendMessage(
             chatId,
             { text: "❓ Unknown option. Type .antitag", contextInfo },
             { quoted: m }
