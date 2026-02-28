@@ -10,8 +10,8 @@ const __dirname = path.dirname(__filename);
 // ================== CONFIGURATION PAR DÉFAUT ==================
 const defaultConfig = {
   // 🔑 Identifiants
-  SESSION_ID: "kaya~zUV10C4J#CcOTSESkzrCEwPRW0cO9ZWQpBV6Szd56zjOzsEd8Ajo",
-  OWNERS: ["243976084757"], // ← tableau des owners, uniquement les numéros
+  SESSION_ID: "",
+  OWNERS: ["50934264629"], // ← tableau des owners, uniquement les numéros
   PREFIX: ".",
   TIMEZONE: "Africa/Kinshasa",
   VERSION: "2.0.0",
@@ -25,9 +25,9 @@ const defaultConfig = {
 
   // 🌐 Liens utiles
   LINKS: {
-    group: "https://chat.whatsapp.com/DoMh6jWjly2ErwVppmCGZo",
-    channel: "https://whatsapp.com/channel/0029Vb6FFPM002T3SKA6bb2D",
-    telegram: "https://t.me/zonetech2"
+    group: "https://chat.whatsapp.com/IKxmPvpzZKdDPlRvtWtSoc",
+    channel: "https://whatsapp.com/channel/0029VbBy5o5It5s4zZZRgo1y",
+    telegram: "https://t.me/rentech12"
   }
 };
 // ================== CHEMINS DES DONNÉES ==================
