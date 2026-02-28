@@ -99,7 +99,7 @@ async function startBot() {
     // ================== CONNECTION ==================
     sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
       if (connection === 'open') {
-        console.log(chalk.green('✅ KAYA-MD CONNECTÉ'));
+        console.log(chalk.green('✅ MEGURU-V1 CONNECTÉ'));
 
         try {
           const jid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
