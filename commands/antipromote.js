@@ -53,13 +53,13 @@ export default {
 
     if (action === 'status') {
       const isActive = antiPromoteData[chatId]?.enabled || false;
-      return kaya.sendMessage(m.chat, { text: isActive ? '✅ *AntiPromote ENABLED*' : '❌ *AntiPromote DISABLED*', contextInfo }, { quoted: m });
+      return meguru.sendMessage(m.chat, { text: isActive ? '✅ *AntiPromote ENABLED*' : '❌ *AntiPromote DISABLED*', contextInfo }, { quoted: m });
     }
 
-    return kaya.sendMessage(m.chat, { text: 'ℹ️ Usage: .antipromote on/off/status', contextInfo }, { quoted: m });
+    return meguru.sendMessage(m.chat, { text: 'ℹ️ Usage: .antipromote on/off/status', contextInfo }, { quoted: m });
   },
 
-  participantUpdate: async (kaya, update) => {
+  participantUpdate: async (meguru, update) => {
     const chatId = update.id;
     const participants = update.participants;
     const action = update.action;
